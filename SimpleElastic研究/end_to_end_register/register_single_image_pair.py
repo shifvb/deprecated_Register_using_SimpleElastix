@@ -16,7 +16,7 @@ def register_single_image_pair(fixed_image_arr: np.ndarray, moving_image_arr: np
     :param moving_image_arr: 要被配准的图像（一张），numpy arr类型
     :param parameter_map_str: 配准方法，默认为translation(截至目前我都不知道这是什么，具体的看文档
         http://simpleelastix.readthedocs.io/)
-    :return: 配准结果的 numpy arr
+    :return: 配准结果的 numpy arr, 以及定义配准的parameter map
     """
     parameter_map = sitk.GetDefaultParameterMap(parameter_map_str)
 
@@ -30,7 +30,7 @@ def register_single_image_pair(fixed_image_arr: np.ndarray, moving_image_arr: np
     # get result
     result_image = elastix_image_filter.GetResultImage()
     result_arr = sitk.GetArrayFromImage(result_image)
-    return result_arr
+    return result_arr, parameter_map
 
 
 def main():
