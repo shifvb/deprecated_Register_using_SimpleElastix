@@ -47,7 +47,7 @@ def main():
     print("moving_image:", moving_image_arr.dtype, moving_image_arr.shape)
 
     # 配准
-    result_arr = register_single_image_pair(fixed_image, moving_image)
+    result_arr = register_single_image_pair(fixed_image, moving_image)[0]
     result_arr = 255 - result_arr
     print(result_arr.dtype, result_arr.shape)
     Image.fromarray(result_arr).show()
