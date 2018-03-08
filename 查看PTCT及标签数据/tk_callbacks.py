@@ -2,7 +2,7 @@ import os
 import time
 import tkinter as tk
 from tkinter import filedialog
-
+import  numpy as np
 import SimpleITK as sitk
 from PIL import Image, ImageTk
 
@@ -90,16 +90,16 @@ def _load_images():
     APP.I.current_mask_img = ImageTk.PhotoImage(Image.fromarray(mask_arr))
     APP.I.label_canvas.create_image(0, 0, image=APP.I.current_mask_img, anchor=tk.NW)
     # 加载ct&label
-    # arr_0 = np.array(ct_arr)
-    # arr_1 = np.array(Image.open(abs_mask_path))[:, :, 0] > 128  # R通道
-    # arr_2 = (arr_0 * (1 - arr_1)).astype(dtype=np.uint8)
-    # APP.I.current_ctl_img = ImageTk.PhotoImage(Image.fromarray(arr_2, "L"))
-    # APP.I.ctl_canvas.create_image(0, 0, image=APP.I.current_ctl_img, anchor=tk.NW)
+    arr_0 = np.array(ct_arr)
+    arr_1 = np.array(mask_arr)[:, :, 0] > 128  # R通道
+    arr_2 = (arr_0 * (1 - arr_1)).astype(dtype=np.uint8)
+    APP.I.current_ctl_img = ImageTk.PhotoImage(Image.fromarray(arr_2))
+    APP.I.ctl_canvas.create_image(0, 0, image=APP.I.current_ctl_img, anchor=tk.NW)
     # 加载pt&label
-    # arr_0 = np.array(pt_arr)
-    # arr_1 = np.array(Image.open(abs_mask_path))[:, :, 0] > 128  # R通道
-    # arr_2 = (arr_0 * (1 - arr_1)).astype(dtype=np.uint8)
-    # APP.I.current_ptl_img = ImageTk.PhotoImage(Image.fromarray(arr_2, "L"))
-    # APP.I.ptl_canvas.create_image(0, 0, image=APP.I.current_ptl_img, anchor=tk.NW)
+    arr_0 = np.array(pt_arr)
+    arr_1 = np.array(mask_arr)[:, :, 0] > 128  # R通道
+    arr_2 = (arr_0 * (1 - arr_1)).astype(dtype=np.uint8)
+    APP.I.current_ptl_img = ImageTk.PhotoImage(Image.fromarray(arr_2))
+    APP.I.ptl_canvas.create_image(0, 0, image=APP.I.current_ptl_img, anchor=tk.NW)
     # 设置title
     APP.I.root.title("当前图像: {}/{}".format(APP.I.current_index + 1, APP.I.total_img_num))

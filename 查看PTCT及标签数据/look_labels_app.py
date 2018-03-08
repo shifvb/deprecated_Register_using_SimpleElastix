@@ -18,9 +18,6 @@ class LookLabelAPP(object):
         self.is_loaded = False
         self.current_index = -1  # 当前图片索引
         self.total_img_num = -1  # 共有多少组图片
-        self.abs_mask_list = list()  # mask path list(absolute)
-        self.abs_ct_list = list()  # mask ct list(absolute)
-        self.abs_pt_list = list()  # mask pt list(absolute)
 
         # ct frame
         self.ct_frame = tk.Frame(self.root, width=512, height=512)
