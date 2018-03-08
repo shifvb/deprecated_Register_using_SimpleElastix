@@ -5,24 +5,31 @@ import dicom
 from PIL import Image
 import SimpleITK as sitk
 
-__version__ = (0, 2, 0)
+__version__ = (0, 3, 0)
 __last_modified__ = 1520496952
 __author__ = "shifvb"
 __email__ = "shifvb@gmail.com"
 
 
-def register_image_series_pt2ct(ct_series: np.ndarray, pt_series: np.ndarray):
+def register_image_series_pt2ct(ct_series_dir: str, pt_series_dir: str):
     """
     将pet图像序列配准到ct图像序列上
-    :param ct_series: ct图像序列numpy数组, 格式参见返回值格式
-    :param pt_series: pt图像序列numpy数组, 格式参见返回值格式
-    :return: 配准后的pt图像序列数组
+    :param ct_series_dir: ct图像序列绝对路径
+    :param pt_series_dir: pt图像序列绝对路径
+    :return: 配准后的pt图像序列数组，原ct图像序列数组，原pt图像序列数组
         class ：np.ndarray
         dtype ：np.float32
         shape ：(图像序列数, 配准后图像高度, 配准后图像宽度)
             若将200张分辨率为128x128的pet图像配准到200张分辨率为512x512的ct图像上，
             则返回数组的shape为(200, 512, 512)
     """
+    # 0. 加载图像序列
+    _original_dir = os.path.abspath(os.curdir)
+    os.chdir(ct_series_dir)
+    ct_series = sitk.ReadImage(os.listdir(ct_series_dir))
+    os.chdir(pt_series_dir)
+    pt_series = sitk.ReadImage(os.listdir(pt_series_dir))
+    os.chdir(_original_dir)
     # 1. 设置配准参数
     parameter_map = sitk.GetDefaultParameterMap("translation")
     parameter_map['RequiredRatioOfValidSamples'] = ['0.05']
@@ -35,22 +42,16 @@ def register_image_series_pt2ct(ct_series: np.ndarray, pt_series: np.ndarray):
     elastix_image_filter.Execute()
     # 4. 得出配准结果
     result_image = elastix_image_filter.GetResultImage()
-    return sitk.GetArrayFromImage(result_image)
+    return sitk.GetArrayFromImage(result_image), sitk.GetArrayFromImage(ct_series), sitk.GetArrayFromImage(pt_series)
 
 
 def main():
-    # 加载图像
-    ct_series_dir = r"F:\做好的分割数据\迟学梅\CT"
-    pt_series_dir = r"F:\做好的分割数据\迟学梅\PT"
-    _original_dir = os.path.abspath(os.curdir)
-    os.chdir(ct_series_dir)
-    ct_series = sitk.ReadImage(os.listdir(ct_series_dir))
-    os.chdir(pt_series_dir)
-    pt_series = sitk.ReadImage(os.listdir(pt_series_dir))
-    os.chdir(_original_dir)
     # 配准
-    result = register_image_series_pt2ct(ct_series, pt_series)
-    sitk.Show(sitk.GetImageFromArray(result))
+    result = register_image_series_pt2ct(ct_series_dir=r"F:\做好的分割数据\迟学梅\CT",
+                                         pt_series_dir=r"F:\做好的分割数据\迟学梅\PT")
+    sitk.Show(sitk.GetImageFromArray(result[0]))
+    sitk.Show(sitk.GetImageFromArray(result[1]))
+    sitk.Show(sitk.GetImageFromArray(result[2]))
 
 
 if __name__ == '__main__':
