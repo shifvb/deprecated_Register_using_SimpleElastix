@@ -47,10 +47,17 @@ class LookLabelAPP(object):
         self.ptl_canvas = tk.Canvas(self.ptl_frame, width=512, height=512)
         self.ptl_canvas.pack()
 
+        # suv frame
+        self.suv_frame = tk.Frame(self.root, width=512, height=512)
+        self.suv_frame.propagate(False)
+        self.suv_frame.grid(row=0, column=2)
+        self.suv_canvas = tk.Canvas(self.suv_frame, width=512, height=512)
+        self.suv_canvas.pack()
+
         # label frame
         self.label_frame = tk.Frame(self.root, width=512, height=512)
         self.label_frame.propagate(False)
-        self.label_frame.grid(row=0, column=2)
+        self.label_frame.grid(row=1, column=2)
         self.label_canvas = tk.Canvas(self.label_frame, width=512, height=512)
         self.label_canvas.pack()
 

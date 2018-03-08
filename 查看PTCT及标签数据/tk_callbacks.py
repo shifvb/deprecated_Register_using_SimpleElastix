@@ -2,15 +2,16 @@ import os
 import time
 import tkinter as tk
 from tkinter import filedialog
-import  numpy as np
+import numpy as np
 import SimpleITK as sitk
 from PIL import Image, ImageTk
 
 from SimpleElastic研究.register_image_series import register_image_series_pt2ct as register
 from 查看PTCT及标签数据 import look_labels_app as APP
-from 查看PTCT及标签数据._utils.ImageProcessor import norm_image
+from 查看PTCT及标签数据._utils.ImageProcessor import norm_image, cal_SUV
 
 _last_load_img_time = time.time()
+_key_press_interval = 0.1
 
 
 def select_dir_btn_callback():
@@ -29,11 +30,8 @@ def load_dir_btn_callback():
 
     # 根据文件夹位置加载图像序列
     _curdir = os.path.abspath(os.curdir)
-    # os.chdir(ct_path)  # load ct
-    # APP.I.ct_arrs = sitk.GetArrayFromImage(sitk.ReadImage(os.listdir(ct_path)))
-    # os.chdir(pt_path)  # load pt
-    # APP.I.pt_arrs = sitk.GetArrayFromImage(sitk.ReadImage(os.listdir(pt_path)))
     APP.I.pt_arrs, APP.I.ct_arrs, _ = register(ct_path, pt_path)  # load ct & pt
+    APP.I.suv_arrs = [cal_SUV(os.path.join(pt_path, _)) for _ in os.listdir(pt_path)]
     os.chdir(mask_path)  # load mask
     APP.I.mask_arrs = sitk.GetArrayFromImage(sitk.ReadImage(os.listdir(mask_path)))
     os.chdir(_curdir)
@@ -52,7 +50,7 @@ def prev_image_callback(event=None):
     if APP.I.is_loaded is False:  # 没加载return
         return
     global _last_load_img_time
-    if time.time() - _last_load_img_time < 0.05:
+    if time.time() - _last_load_img_time < _key_press_interval:
         return
     _last_load_img_time = time.time()
     if APP.I.current_index <= 0:  # 越界reutrn
@@ -66,7 +64,7 @@ def next_image_callback(event=None):
     if APP.I.is_loaded is False:  # 没加载return
         return
     global _last_load_img_time
-    if time.time() - _last_load_img_time < 0.05:
+    if time.time() - _last_load_img_time < _key_press_interval:
         return
     _last_load_img_time = time.time()
     if APP.I.current_index >= APP.I.total_img_num - 1:  # 越界reutrn
@@ -85,6 +83,10 @@ def _load_images():
     pt_arr = norm_image(APP.I.pt_arrs[APP.I.current_index])
     APP.I.current_pt_img = ImageTk.PhotoImage(Image.fromarray(pt_arr, "L"))
     APP.I.pt_canvas.create_image(0, 0, image=APP.I.current_pt_img, anchor=tk.NW)
+    # 加载suv
+    suv_arr = norm_image(APP.I.suv_arrs[APP.I.current_index])
+    APP.I.current_suv_img = ImageTk.PhotoImage(Image.fromarray(suv_arr, "L").resize([512, 512]))
+    APP.I.suv_canvas.create_image(0, 0, image=APP.I.current_suv_img, anchor=tk.NW)
     # 加载mask
     mask_arr = norm_image(APP.I.mask_arrs[APP.I.current_index])
     APP.I.current_mask_img = ImageTk.PhotoImage(Image.fromarray(mask_arr))
