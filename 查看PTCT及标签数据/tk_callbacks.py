@@ -54,7 +54,7 @@ def prev_image_callback(event=None):
         return
     _last_load_img_time = time.time()
     if APP.I.current_index <= 0:  # 越界reutrn
-        return
+        APP.I.current_index = APP.I.total_img_num
     APP.I.current_index -= 1
     _load_images()
 
@@ -68,7 +68,7 @@ def next_image_callback(event=None):
         return
     _last_load_img_time = time.time()
     if APP.I.current_index >= APP.I.total_img_num - 1:  # 越界reutrn
-        return
+        APP.I.current_index = -1
     APP.I.current_index += 1
     _load_images()
 
@@ -93,9 +93,13 @@ def _load_images():
     APP.I.label_canvas.create_image(0, 0, image=APP.I.current_mask_img, anchor=tk.NW)
     # 加载ct&label
     arr_0 = np.array(ct_arr)
-    arr_1 = np.array(mask_arr)[:, :, 0] > 128  # R通道
-    arr_2 = (arr_0 * (1 - arr_1)).astype(dtype=np.uint8)
-    APP.I.current_ctl_img = ImageTk.PhotoImage(Image.fromarray(arr_2))
+    arr_1 = (np.array(mask_arr)[:, :, 0] > 128) * 128
+    arr_2 = np.zeros(shape=[3, arr_0.shape[0], arr_0.shape[1]], dtype=np.uint8)
+    arr_2[0] = arr_0  # R通道
+    arr_2[1] = arr_1  # G通道
+    arr_2[2] = arr_0  # B通道
+    arr_2 = arr_2.transpose([1, 2, 0])
+    APP.I.current_ctl_img = ImageTk.PhotoImage(Image.fromarray(arr_2, "RGB"))
     APP.I.ctl_canvas.create_image(0, 0, image=APP.I.current_ctl_img, anchor=tk.NW)
     # 加载pt&label
     arr_0 = np.array(pt_arr)
