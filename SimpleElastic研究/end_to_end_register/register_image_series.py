@@ -6,7 +6,7 @@ from PIL import Image
 import SimpleITK as sitk
 
 __version__ = (0, 3, 0)
-__last_modified__ = 1520496952
+__last_modified__ = 1520499603
 __author__ = "shifvb"
 __email__ = "shifvb@gmail.com"
 
