@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter.font import Font
 from 查看PTCT及标签数据.tk_callbacks import select_dir_btn_callback, load_dir_btn_callback
-from 查看PTCT及标签数据.tk_callbacks import prev_image_callback, next_image_callback
+from 查看PTCT及标签数据.tk_callbacks import prev_image_callback, next_image_callback, suv_scale_callback
 
 I = None  # "I" for instance
 
@@ -13,7 +13,6 @@ class LookLabelAPP(object):
         self.root = tk.Tk()
         self.root.bind("<Left>", prev_image_callback)
         self.root.bind("<Right>", next_image_callback)
-        # self.root.geometry("1920x1010-0+0")
         self.config = config
         self.is_loaded = False
         self.current_index = -1  # 当前图片索引
@@ -61,10 +60,15 @@ class LookLabelAPP(object):
         self.label_canvas = tk.Canvas(self.label_frame, width=512, height=512)
         self.label_canvas.pack()
 
+        # right frame
+        right_frame = tk.Frame(self.root)
+        right_frame.propagate(False)
+        right_frame.grid(row=0, rowspan=2, column=3, sticky=tk.NW)
+
         # choose folder entry
-        self.load_dir_frame = tk.Frame(self.root, width=384, height=128)
+        self.load_dir_frame = tk.LabelFrame(right_frame, width=384, height=128, text="load file")
         self.load_dir_frame.propagate(False)
-        self.load_dir_frame.grid(row=0, column=3)
+        self.load_dir_frame.grid(row=0, column=0, sticky=tk.NW)
         self.load_dir_var = tk.StringVar(value=self.config["default_load_path"] if self.config["debug"] else "")
         self.load_dir_entry = tk.Entry(self.load_dir_frame, width=25, font=Font(size=20),
                                        textvariable=self.load_dir_var)
@@ -77,16 +81,26 @@ class LookLabelAPP(object):
         self.load_dir_btn.pack(side=tk.TOP, padx=5)
 
         # page control frame
-        self.page_ctrl_frame = tk.Frame(self.root, width=384, height=30)
-        self.page_ctrl_frame.propagate(False)
-        self.page_ctrl_frame.grid(row=1, column=3, sticky=tk.NS)
-        self.prev_btn = tk.Button(self.page_ctrl_frame, text="prev image", font=Font(size=15),
-                                  command=prev_image_callback)
+        # self.page_ctrl_frame = tk.Frame(right_frame, width=384, height=30)
+        # self.page_ctrl_frame.propagate(False)
+        # self.page_ctrl_frame.grid(row=1, column=0, sticky=tk.NS)
+        # self.prev_btn = tk.Button(self.page_ctrl_frame, text="prev image", font=Font(size=15),
+        #                           command=prev_image_callback)
+        #
+        # self.next_btn = tk.Button(self.page_ctrl_frame, text="next image", font=Font(size=15),
+        #                           command=next_image_callback)
+        #
+        # self.next_btn.pack(side=tk.RIGHT)
+        # self.prev_btn.pack(side=tk.RIGHT)
 
-        self.next_btn = tk.Button(self.page_ctrl_frame, text="next image", font=Font(size=15),
-                                  command=next_image_callback)
-
-        self.next_btn.pack(side=tk.RIGHT)
-        self.prev_btn.pack(side=tk.RIGHT)
+        # 调整SUV阈值
+        self.suv_threshold_frame = tk.LabelFrame(right_frame, width=384, text="SUV阈值")
+        # self.suv_threshold_frame.propagate(False)
+        self.suv_threshold_frame.grid(row=1, column=0)
+        self.suv_scale = tk.Scale(self.suv_threshold_frame)
+        self.suv_scale.configure({"from": 1.0, "to": 2.5, "resolution": 0.1, "orient": "horizontal" ,
+                             "command": suv_scale_callback, "length": 384})
+        self.suv_scale.set(1.5)
+        self.suv_scale.pack()
 
         tk.mainloop()
