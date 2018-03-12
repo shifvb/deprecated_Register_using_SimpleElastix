@@ -2,17 +2,17 @@ import os
 import time
 import tkinter as tk
 from tkinter import filedialog
-
+import pickle
 import SimpleITK as sitk
 import numpy as np
 from PIL import Image, ImageTk
 
 from current_work import look_labels_app as APP
-from current_work._utils.ImageProcessor import norm_image, threshold_image
-from current_work._utils.load_data.load_data import load_data
+from current_work.utils.ImageProcessor import norm_image, threshold_image
+from current_work.utils.load_data.load_data import load_data
 
 _last_load_img_time = time.time()
-_key_press_interval = 0.1
+_key_press_interval = 0.09
 
 
 def select_dir_btn_callback():
@@ -30,7 +30,15 @@ def load_dir_btn_callback():
     pt_path = os.path.join(path, "PT")
 
     # 加载图像序列
-    APP.I.pt_arrs, APP.I.ct_arrs, APP.I.suv_arrs, APP.I.mask_arrs = load_data(ct_path, pt_path, mask_path)
+    _temp_dir = os.path.join(path, APP.I.config["temp_dir_name"])
+    if not os.path.isdir(_temp_dir):
+        os.mkdir(_temp_dir)
+    _temp_filename = os.path.join(_temp_dir, "registered.pydump")
+    if not os.path.exists(_temp_filename):
+        APP.I.pt_arrs, APP.I.ct_arrs, APP.I.suv_arrs, APP.I.mask_arrs = load_data(ct_path, pt_path, mask_path)
+        pickle.dump([APP.I.pt_arrs, APP.I.ct_arrs, APP.I.suv_arrs, APP.I.mask_arrs], open(_temp_filename, 'wb'))
+    else:
+        APP.I.pt_arrs, APP.I.ct_arrs, APP.I.suv_arrs, APP.I.mask_arrs = pickle.load(open(_temp_filename, 'rb'))
 
     # 加载后设置变量
     APP.I.total_img_num = len(APP.I.ct_arrs)

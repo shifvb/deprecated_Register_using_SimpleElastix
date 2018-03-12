@@ -1,7 +1,8 @@
 import os
 import SimpleITK as sitk
-from current_work._utils.register.register_SimpleElastix import register_image_series_pt2ct as register
-from current_work._utils.SUV_calculation.SUVTools import getRegistedSUVs
+from current_work.utils.register.register_SimpleElastix import register_image_series_pt2ct as register
+from current_work.utils.SUV_calculation.SUVTools import getRegistedSUVs
+
 
 def load_data(ct_path, pt_path, mask_path):
     # (1) load ct & pt
