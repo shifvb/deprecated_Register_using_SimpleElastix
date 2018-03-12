@@ -1,4 +1,4 @@
-from current_work._utils.load_config import load_config
+from current_work.utils.load_config import load_config
 from current_work.look_labels_app import LookLabelAPP
 
 
