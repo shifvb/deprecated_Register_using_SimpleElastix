@@ -2,14 +2,15 @@ import os
 import time
 import tkinter as tk
 from tkinter import filedialog
-import numpy as np
+
 import SimpleITK as sitk
+import numpy as np
 from PIL import Image, ImageTk
 
-from SimpleElastic研究.register_image_series import register_image_series_pt2ct as register
 from 查看PTCT及标签数据 import look_labels_app as APP
 from 查看PTCT及标签数据._utils.ImageProcessor import norm_image, threshold_image
-from 查看PTCT及标签数据._utils.SUVTools import getRegistedSUVs
+from 查看PTCT及标签数据._utils.SUV_calculation.SUVTools import getRegistedSUVs
+from 查看PTCT及标签数据._utils.register.register_SimpleElastix import register_image_series_pt2ct as register
 
 _last_load_img_time = time.time()
 _key_press_interval = 0.1
