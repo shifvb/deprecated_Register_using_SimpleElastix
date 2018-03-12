@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter.font import Font
-from current_work.tk_callbacks import select_dir_btn_callback, load_dir_btn_callback
-from current_work.tk_callbacks import prev_image_callback, next_image_callback, suv_scale_callback
+
+from current_work.look_labels_app.tk_callbacks import prev_image_callback, next_image_callback, suv_scale_callback
+from current_work.look_labels_app.tk_callbacks import select_dir_btn_callback, load_dir_btn_callback
 
 I = None  # "I" for instance
 
@@ -80,26 +81,13 @@ class LookLabelAPP(object):
                                       command=load_dir_btn_callback, width=15)
         self.load_dir_btn.pack(side=tk.TOP, padx=5)
 
-        # page control frame
-        # self.page_ctrl_frame = tk.Frame(right_frame, width=384, height=30)
-        # self.page_ctrl_frame.propagate(False)
-        # self.page_ctrl_frame.grid(row=1, column=0, sticky=tk.NS)
-        # self.prev_btn = tk.Button(self.page_ctrl_frame, text="prev image", font=Font(size=15),
-        #                           command=prev_image_callback)
-        #
-        # self.next_btn = tk.Button(self.page_ctrl_frame, text="next image", font=Font(size=15),
-        #                           command=next_image_callback)
-        #
-        # self.next_btn.pack(side=tk.RIGHT)
-        # self.prev_btn.pack(side=tk.RIGHT)
-
         # 调整SUV阈值
         self.suv_threshold_frame = tk.LabelFrame(right_frame, width=384, text="SUV阈值")
         # self.suv_threshold_frame.propagate(False)
         self.suv_threshold_frame.grid(row=1, column=0)
         self.suv_scale = tk.Scale(self.suv_threshold_frame)
-        self.suv_scale.configure({"from": 1.0, "to": 2.5, "resolution": 0.1, "orient": "horizontal" ,
-                             "command": suv_scale_callback, "length": 384})
+        self.suv_scale.configure({"from": 1.0, "to": 2.5, "resolution": 0.1, "orient": "horizontal",
+                                  "command": suv_scale_callback, "length": 384})
         self.suv_scale.set(1.5)
         self.suv_scale.pack()
 

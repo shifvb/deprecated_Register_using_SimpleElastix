@@ -7,7 +7,7 @@ import SimpleITK as sitk
 import numpy as np
 from PIL import Image, ImageTk
 
-from current_work import look_labels_app as APP
+from current_work.look_labels_app import look_labels_app as APP
 from current_work.utils.ImageProcessor import norm_image, threshold_image
 from current_work.utils.load_data.load_data import load_data
 
