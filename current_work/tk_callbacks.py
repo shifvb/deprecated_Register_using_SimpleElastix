@@ -7,10 +7,9 @@ import SimpleITK as sitk
 import numpy as np
 from PIL import Image, ImageTk
 
-from 查看PTCT及标签数据 import look_labels_app as APP
-from 查看PTCT及标签数据._utils.ImageProcessor import norm_image, threshold_image
-from 查看PTCT及标签数据._utils.SUV_calculation.SUVTools import getRegistedSUVs
-from 查看PTCT及标签数据._utils.register.register_SimpleElastix import register_image_series_pt2ct as register
+from current_work import look_labels_app as APP
+from current_work._utils.ImageProcessor import norm_image, threshold_image
+from current_work._utils.load_data.load_data import load_data
 
 _last_load_img_time = time.time()
 _key_press_interval = 0.1
@@ -30,13 +29,8 @@ def load_dir_btn_callback():
     ct_path = os.path.join(path, "CT")
     pt_path = os.path.join(path, "PT")
 
-    # 根据文件夹位置加载图像序列
-    _curdir = os.path.abspath(os.curdir)
-    APP.I.pt_arrs, APP.I.ct_arrs, _ = register(ct_path, pt_path)  # load ct & pt
-    APP.I.suv_arrs = getRegistedSUVs(APP.I.pt_arrs, pt_path)  # calculate suv
-    os.chdir(mask_path)  # load mask
-    APP.I.mask_arrs = sitk.GetArrayFromImage(sitk.ReadImage(os.listdir(mask_path)))
-    os.chdir(_curdir)
+    # 加载图像序列
+    APP.I.pt_arrs, APP.I.ct_arrs, APP.I.suv_arrs, APP.I.mask_arrs = load_data(ct_path, pt_path, mask_path)
 
     # 加载后设置变量
     APP.I.total_img_num = len(APP.I.ct_arrs)
@@ -132,4 +126,4 @@ def suv_scale_callback(*args):
     APP.I.current_thsuv_img = ImageTk.PhotoImage(Image.fromarray(thsuv_arr, "L"))
     APP.I.label_canvas.create_image(0, 0, image=APP.I.current_thsuv_img, anchor=tk.NW)
     APP.I.label_canvas.create_text(20, 20, fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW,
-                                   text="SUV > {}".format( APP.I.suv_scale.get()))
+                                   text="SUV > {}".format(APP.I.suv_scale.get()))

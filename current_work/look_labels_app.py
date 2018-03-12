@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter.font import Font
-from 查看PTCT及标签数据.tk_callbacks import select_dir_btn_callback, load_dir_btn_callback
-from 查看PTCT及标签数据.tk_callbacks import prev_image_callback, next_image_callback, suv_scale_callback
+from current_work.tk_callbacks import select_dir_btn_callback, load_dir_btn_callback
+from current_work.tk_callbacks import prev_image_callback, next_image_callback, suv_scale_callback
 
 I = None  # "I" for instance
 
