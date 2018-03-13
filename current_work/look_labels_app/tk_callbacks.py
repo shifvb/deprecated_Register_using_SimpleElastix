@@ -3,13 +3,12 @@ import time
 import tkinter as tk
 from tkinter import filedialog
 import pickle
-import SimpleITK as sitk
 import numpy as np
 from PIL import Image, ImageTk
-
 from current_work.look_labels_app import look_labels_app as APP
 from current_work.utils.ImageProcessor import norm_image, threshold_image
 from current_work.utils.load_data.load_data import load_data
+from current_work.look_labels_app.gui.coronal_plane_gui import CoronalPlaneGUI
 
 _last_load_img_time = time.time()
 _key_press_interval = 0.09
@@ -131,7 +130,9 @@ def suv_scale_callback(*args):
     APP.I.label_canvas.create_text(20, 20, fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW,
                                    text="SUV > {}".format(APP.I.suv_scale.get()))
 
+
 def load_coronal_plane():
     """加载冠状面病人图像"""
-    from current_work.look_labels_app.gui.coronal_plane_gui import MyTopLevel
-    MyTopLevel()
+    if not APP.I.is_loaded:
+        return
+    CoronalPlaneGUI(APP.I.ct_arrs)

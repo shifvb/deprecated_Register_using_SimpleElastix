@@ -19,7 +19,7 @@ class LookLabelAPP(object):
         self.is_loaded = False
         self.current_index = -1  # 当前图片索引
         self.total_img_num = -1  # 共有多少组图片
-
+        self.root.focus_set()
         # ct frame
         self.ct_frame = tk.Frame(self.root, width=512, height=512)
         self.ct_frame.propagate(False)
