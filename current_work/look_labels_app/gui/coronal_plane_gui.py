@@ -4,6 +4,8 @@ import numpy as np
 from current_work.utils.ImageProcessor import norm_image
 
 
+
+
 class CoronalPlaneGUI(tk.Toplevel):
     def __init__(self, ct_arrs: np.ndarray):
         super().__init__()

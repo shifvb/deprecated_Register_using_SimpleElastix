@@ -4,7 +4,6 @@ from current_work.look_labels_app.look_labels_app import LookLabelAPP
 
 def main():
     config = load_config()
-
     LookLabelAPP(config=config)
 
 
