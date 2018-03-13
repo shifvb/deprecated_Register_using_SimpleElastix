@@ -35,10 +35,10 @@ def load_dir_btn_callback():
         os.mkdir(_temp_dir)
     _temp_filename = os.path.join(_temp_dir, "registered.pydump")
     if not os.path.exists(_temp_filename):
-        APP.I.pt_arrs, APP.I.ct_arrs, APP.I.suv_arrs, APP.I.mask_arrs = load_data(ct_path, pt_path, mask_path)
+        APP.I.ct_arrs, APP.I.pt_arrs, APP.I.suv_arrs, APP.I.mask_arrs = load_data(ct_path, pt_path, mask_path)
         pickle.dump([APP.I.pt_arrs, APP.I.ct_arrs, APP.I.suv_arrs, APP.I.mask_arrs], open(_temp_filename, 'wb'))
     else:
-        APP.I.pt_arrs, APP.I.ct_arrs, APP.I.suv_arrs, APP.I.mask_arrs = pickle.load(open(_temp_filename, 'rb'))
+        APP.I.ct_arrs, APP.I.pt_arrs, APP.I.suv_arrs, APP.I.mask_arrs = pickle.load(open(_temp_filename, 'rb'))
 
     # 加载后设置变量
     APP.I.total_img_num = len(APP.I.ct_arrs)
