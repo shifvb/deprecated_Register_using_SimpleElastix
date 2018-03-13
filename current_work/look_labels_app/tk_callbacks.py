@@ -35,10 +35,10 @@ def load_dir_btn_callback():
         os.mkdir(_temp_dir)
     _temp_filename = os.path.join(_temp_dir, "registered.pydump")
     if not os.path.exists(_temp_filename):
-        APP.I.ct_arrs, APP.I.pt_arrs, APP.I.suv_arrs, APP.I.mask_arrs = load_data(ct_path, pt_path, mask_path)
-        pickle.dump([APP.I.pt_arrs, APP.I.ct_arrs, APP.I.suv_arrs, APP.I.mask_arrs], open(_temp_filename, 'wb'))
+        APP.I.ct_arrs, _, APP.I.suv_arrs, APP.I.mask_arrs = load_data(ct_path, pt_path, mask_path)
+        pickle.dump([APP.I.ct_arrs, APP.I.suv_arrs, APP.I.mask_arrs], open(_temp_filename, 'wb'))
     else:
-        APP.I.ct_arrs, APP.I.pt_arrs, APP.I.suv_arrs, APP.I.mask_arrs = pickle.load(open(_temp_filename, 'rb'))
+        APP.I.ct_arrs, APP.I.suv_arrs, APP.I.mask_arrs = pickle.load(open(_temp_filename, 'rb'))
 
     # 加载后设置变量
     APP.I.total_img_num = len(APP.I.ct_arrs)
@@ -57,7 +57,7 @@ def prev_image_callback(event=None):
     if time.time() - _last_load_img_time < _key_press_interval:
         return
     _last_load_img_time = time.time()
-    if APP.I.current_index <= 0:  # 越界reutrn
+    if APP.I.current_index <= 0:  # 越界return
         APP.I.current_index = APP.I.total_img_num
     APP.I.current_index -= 1
     _load_images()
@@ -71,7 +71,7 @@ def next_image_callback(event=None):
     if time.time() - _last_load_img_time < _key_press_interval:
         return
     _last_load_img_time = time.time()
-    if APP.I.current_index >= APP.I.total_img_num - 1:  # 越界reutrn
+    if APP.I.current_index >= APP.I.total_img_num - 1:  # 越界return
         APP.I.current_index = -1
     APP.I.current_index += 1
     _load_images()
@@ -84,12 +84,7 @@ def _load_images():
     APP.I.current_ct_img = ImageTk.PhotoImage(Image.fromarray(ct_arr, "L"))
     APP.I.ct_canvas.create_image(0, 0, image=APP.I.current_ct_img, anchor=tk.NW)
     APP.I.ct_canvas.create_text(20, 20, text="CT", fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW)
-    # (row_0, col_1) 加载pt
-    pt_arr = norm_image(APP.I.pt_arrs[APP.I.current_index])
-    APP.I.current_pt_img = ImageTk.PhotoImage(Image.fromarray(pt_arr, "L"))
-    APP.I.pt_canvas.create_image(0, 0, image=APP.I.current_pt_img, anchor=tk.NW)
-    APP.I.pt_canvas.create_text(20, 20, text="PET", fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW)
-    # (row_0, col_2)加载suv
+    # (row_0, col_1)加载suv
     suv_arr = norm_image(APP.I.suv_arrs[APP.I.current_index])
     APP.I.current_suv_img = ImageTk.PhotoImage(Image.fromarray(suv_arr, "L").resize([512, 512]))
     APP.I.suv_canvas.create_image(0, 0, image=APP.I.current_suv_img, anchor=tk.NW)
@@ -109,17 +104,17 @@ def _load_images():
     APP.I.current_ctl_img = ImageTk.PhotoImage(Image.fromarray(arr_2, "RGB"))
     APP.I.ctl_canvas.create_image(0, 0, image=APP.I.current_ctl_img, anchor=tk.NW)
     APP.I.ctl_canvas.create_text(20, 20, text="CT & Label", fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW)
-    # (row_1, col_1) 加载pt&label
-    arr_0 = np.array(pt_arr)
+    # (row_1, col_1) 加载suv&label
+    arr_0 = np.array(suv_arr)
     arr_1 = (np.array(mask_arr)[:, :, 0] > 128) * 255
     arr_2 = np.empty(shape=[3, arr_0.shape[0], arr_0.shape[1]], dtype=np.uint8)
     arr_2[0] = (arr_0 + arr_1) / 2  # R通道
     arr_2[1] = arr_0  # G通道
     arr_2[2] = arr_1  # B通道
     arr_2 = arr_2.transpose([1, 2, 0])
-    APP.I.current_ptl_img = ImageTk.PhotoImage(Image.fromarray(arr_2, "RGB"))
-    APP.I.ptl_canvas.create_image(0, 0, image=APP.I.current_ptl_img, anchor=tk.NW)
-    APP.I.ptl_canvas.create_text(20, 20, text="PET & Label", fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW)
+    APP.I.current_suvl_img = ImageTk.PhotoImage(Image.fromarray(arr_2, "RGB"))
+    APP.I.suvl_canvas.create_image(0, 0, image=APP.I.current_suvl_img, anchor=tk.NW)
+    APP.I.suvl_canvas.create_text(20, 20, text="SUV & Label", fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW)
     # (row_1, col_2) 加载suv > 1.5
     suv_scale_callback()
 

@@ -33,26 +33,19 @@ class LookLabelAPP(object):
         self.ctl_canvas = tk.Canvas(self.ctl_frame, width=512, height=512)
         self.ctl_canvas.pack()
 
-        # pt frame
-        self.pt_frame = tk.Frame(self.root, width=512, height=512)
-        self.pt_frame.propagate(False)
-        self.pt_frame.grid(row=0, column=1)
-        self.pt_canvas = tk.Canvas(self.pt_frame, width=512, height=512)
-        self.pt_canvas.pack()
-
-        # pt & label frame
-        self.ptl_frame = tk.Frame(self.root, width=512, height=512)
-        self.ptl_frame.propagate(False)
-        self.ptl_frame.grid(row=1, column=1)
-        self.ptl_canvas = tk.Canvas(self.ptl_frame, width=512, height=512)
-        self.ptl_canvas.pack()
-
         # suv frame
         self.suv_frame = tk.Frame(self.root, width=512, height=512)
         self.suv_frame.propagate(False)
-        self.suv_frame.grid(row=0, column=2)
+        self.suv_frame.grid(row=0, column=1)
         self.suv_canvas = tk.Canvas(self.suv_frame, width=512, height=512)
         self.suv_canvas.pack()
+
+        # suv & label frame
+        self.suvl_frame = tk.Frame(self.root, width=512, height=512)
+        self.suvl_frame.propagate(False)
+        self.suvl_frame.grid(row=1, column=1)
+        self.suvl_canvas = tk.Canvas(self.suvl_frame, width=512, height=512)
+        self.suvl_canvas.pack()
 
         # label frame
         self.label_frame = tk.Frame(self.root, width=512, height=512)
@@ -86,8 +79,8 @@ class LookLabelAPP(object):
         # self.suv_threshold_frame.propagate(False)
         self.suv_threshold_frame.grid(row=1, column=0)
         self.suv_scale = tk.Scale(self.suv_threshold_frame)
-        self.suv_scale.configure({"from": 1.0, "to": 2.5, "resolution": 0.1, "orient": "horizontal",
-                                  "command": suv_scale_callback, "length": 384})
+        self.suv_scale.configure(from_=1.0, to=2.5, resolution=0.1, orient=tk.HORIZONTAL, command=suv_scale_callback,
+                                 length=380)
         self.suv_scale.set(1.5)
         self.suv_scale.pack()
 
