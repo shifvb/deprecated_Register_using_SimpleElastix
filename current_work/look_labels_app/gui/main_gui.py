@@ -6,7 +6,7 @@ from current_work.utils.load_data.load_data import load_data
 from current_work.look_labels_app.gui import CoronalPlaneGUI, TransversePlaneGUI
 
 
-class LookLabelAPP(object):
+class MainGUI(object):
     def __init__(self, config: dict):
         self.root = tk.Tk()
         self.config = config
@@ -51,12 +51,10 @@ class LookLabelAPP(object):
 
     def select_dir_btn_callback(self):
         """用户点击选择文件夹按钮回调函数"""
-        path = filedialog.askdirectory()
-        self.load_dir_var.set(path)
+        self.load_dir_var.set(filedialog.askdirectory())
 
     def load_coronal_plane(self):
         """加载冠状面病人图像"""
-
         CoronalPlaneGUI(self.ct_arrs) if self.is_loaded else None
 
     def load_transverse_plane(self):
