@@ -130,3 +130,8 @@ def suv_scale_callback(*args):
     APP.I.label_canvas.create_image(0, 0, image=APP.I.current_thsuv_img, anchor=tk.NW)
     APP.I.label_canvas.create_text(20, 20, fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW,
                                    text="SUV > {}".format(APP.I.suv_scale.get()))
+
+def load_coronal_plane():
+    """加载冠状面病人图像"""
+    from current_work.look_labels_app.gui.coronal_plane_gui import MyTopLevel
+    MyTopLevel()

@@ -3,6 +3,7 @@ from tkinter.font import Font
 
 from current_work.look_labels_app.tk_callbacks import prev_image_callback, next_image_callback, suv_scale_callback
 from current_work.look_labels_app.tk_callbacks import select_dir_btn_callback, load_dir_btn_callback
+from current_work.look_labels_app.tk_callbacks import load_coronal_plane
 
 I = None  # "I" for instance
 
@@ -83,5 +84,8 @@ class LookLabelAPP(object):
                                  length=380)
         self.suv_scale.set(1.5)
         self.suv_scale.pack()
+
+        # 加载冠状面
+        tk.Button(right_frame, text="加载冠状面", command=load_coronal_plane).grid(row=2)
 
         tk.mainloop()
