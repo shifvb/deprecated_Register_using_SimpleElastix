@@ -1,4 +1,5 @@
 import os
+from copy import deepcopy
 import tkinter as tk
 from tkinter.font import Font
 from tkinter import filedialog
@@ -19,7 +20,8 @@ class MainGUI(object):
         self.pt_arrs = None
         self.suv_arrs = None
         self.mask_arrs = None
-        self.patient_info = None
+        self.patient_info_ct = None
+        self.patient_info_pt = None
 
         # choose folder entry
         self.load_dir_frame = tk.LabelFrame(self.root, text="load file")
@@ -54,7 +56,8 @@ class MainGUI(object):
                       temp_dir_name=self.config["temp_dir_name"])
         self.ct_arrs, self.pt_arrs, self.suv_arrs, self.mask_arrs = _
         # 加载病人基本信息
-        self.patient_info = getBaseInfo(pt_path)
+        self.patient_info_ct = deepcopy(getBaseInfo(ct_path))
+        self.patient_info_pt = deepcopy(getBaseInfo(pt_path))
 
         self.is_loaded = True
 
@@ -64,7 +67,7 @@ class MainGUI(object):
 
     def load_coronal_plane(self):
         """加载冠状面病人图像"""
-        CoronalPlaneGUI(self.ct_arrs, self.patient_info) if self.is_loaded else None
+        CoronalPlaneGUI(self.ct_arrs, self.patient_info_ct) if self.is_loaded else None
 
     def load_transverse_plane(self):
         """加载横断面病人图像"""
