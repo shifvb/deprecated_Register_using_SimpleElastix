@@ -11,7 +11,7 @@ class CoronalPlaneGUI(tk.Toplevel):
         # 窗口设置
         self._window_size = (1000, 1024)  # height, width
         self.top_level = self
-        self.top_level.title("Coronal Plane View")
+        self.top_level.title("CoronalPlaneView")
         self.top_level.geometry("1024x1000+0+0")
         self.top_level.bind("<Key-Left>", self.prev_page_callback)
         self.top_level.bind("<Key-Right>", self.next_page_callback)
@@ -59,7 +59,7 @@ class CoronalPlaneGUI(tk.Toplevel):
         self.pt_canvas.create_image(0, 0, image=self.current_pt_img, anchor=tk.NW)
 
         # 设置title
-        self.top_level.title("Coronal Plane View ({} / {})".format(self.current_index + 1, self.total_img_num))
+        self.top_level.title("CoronalPlaneView ({} / {})".format(self.current_index + 1, self.total_img_num))
 
     def from_transverse_plane_to_coronal_plane(self, ct_arrs):
         """从横断面转到冠状面进行数组转换，
