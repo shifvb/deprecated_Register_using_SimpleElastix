@@ -17,7 +17,7 @@ class CoronalPlaneGUI(tk.Toplevel):
         self.top_level.bind("<Key-Right>", self.next_page_callback)
         self.top_level.protocol("WM_DELETE_WINDOW", self.close_window_callback)
         self.top_level.focus_set()
-        self.clock = Clock(0.05)
+        self.clock = Clock(0.1)
 
         # 数据设置
         self.current_index = 0
@@ -26,6 +26,10 @@ class CoronalPlaneGUI(tk.Toplevel):
         self.ct_arrs = self.from_transverse_plane_to_coronal_plane(ct_arrs)
         self.pt_arrs = self.from_transverse_plane_to_coronal_plane(pt_arrs)
         self.mask_arrs = self.from_transverse_plane_to_coronal_plane(mask_arrs[:, :, :, 0])
+
+        self.ct_arrs = norm_image(self.ct_arrs)
+        self.pt_arrs = self.pt_arrs
+        self.mask_arrs = norm_image(self.mask_arrs)
 
         # UI设置
 
@@ -55,7 +59,7 @@ class CoronalPlaneGUI(tk.Toplevel):
     def load_images(self):
         """在界面上加载图像"""
         # load ct image
-        ct_arr = norm_image(self.ct_arrs[self.current_index])
+        ct_arr = self.ct_arrs[self.current_index]
         self.current_ct_img = ImageTk.PhotoImage(self.resize_to_fit_screen(ct_arr))
         self.ct_canvas.create_image(0, 0, image=self.current_ct_img, anchor=tk.NW)
         # load pt image
@@ -63,7 +67,7 @@ class CoronalPlaneGUI(tk.Toplevel):
         self.current_pt_img = ImageTk.PhotoImage(self.resize_to_fit_screen(pt_arr))
         self.pt_canvas.create_image(0, 0, image=self.current_pt_img, anchor=tk.NW)
         # load mask image
-        mask_arr = norm_image(self.mask_arrs[self.current_index])
+        mask_arr = self.mask_arrs[self.current_index]
         self.current_mask_img = ImageTk.PhotoImage(self.resize_to_fit_screen(mask_arr))
         self.mask_canvas.create_image(0, 0, image=self.current_mask_img, anchor=tk.NW)
 
@@ -80,12 +84,13 @@ class CoronalPlaneGUI(tk.Toplevel):
         _old_size = arrs[0].shape
         _new_size = [int(_) for _ in (_old_size[0] * _ratio, _old_size[1])]
         _new_size.reverse()  # PIL.Image.resize() receive format of (width, height), rather than (height, width)
-        return np.stack([np.array(Image.fromarray(_).resize(_new_size)) for _ in arrs], axis=0)
+        return np.stack([np.array(Image.fromarray(_).resize(_new_size, Image.BILINEAR)) for _ in arrs], axis=0)
 
     def resize_to_fit_screen(self, arr: np.ndarray):
         """根据窗口大小缩放图像"""
         _fit_ratio = min(self._window_size[0] / arr.shape[0], self._window_size[1] / arr.shape[1])
-        return Image.fromarray(arr).resize([int(arr.shape[1] * _fit_ratio), int(arr.shape[0] * _fit_ratio)])
+        return Image.fromarray(arr).resize([int(arr.shape[1] * _fit_ratio), int(arr.shape[0] * _fit_ratio)],
+                                           Image.BILINEAR)
 
     def prev_page_callback(self, *args):
         """上一张图像回调函数"""
