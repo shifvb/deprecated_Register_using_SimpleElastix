@@ -2,7 +2,7 @@ import os
 import tkinter as tk
 from tkinter.font import Font
 from tkinter import filedialog
-from current_work.utils.load_data.load_data import load_data
+from current_work.utils.load_data import load_data
 from current_work.look_labels_app.gui import CoronalPlaneGUI, TransversePlaneGUI
 
 

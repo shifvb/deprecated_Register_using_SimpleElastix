@@ -1,7 +1,4 @@
 import numpy as np
-import dicom
-import time
-import datetime
 
 
 def threshold_image(arr: np.ndarray, threshold: float):
@@ -31,7 +28,7 @@ def norm_image(arr: np.ndarray):
 
 
 if __name__ == '__main__':
-    arr = np.array([1,3,4])
+    arr = np.array([1, 3, 4])
     arr2 = threshold_image(arr, 3)
     print(arr)
     print(arr2)

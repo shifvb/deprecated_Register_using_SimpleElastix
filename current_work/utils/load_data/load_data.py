@@ -1,7 +1,7 @@
 import os
 import pickle
 import SimpleITK as sitk
-from current_work.utils.register.register_SimpleElastix import register_image_series_pt2ct as register
+from current_work.utils.register import register
 from current_work.utils.SUV_calculation.SUVTools import getRegistedSUVs
 
 
