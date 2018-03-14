@@ -67,7 +67,7 @@ class MainGUI(object):
 
     def load_coronal_plane(self):
         """加载冠状面病人图像"""
-        CoronalPlaneGUI(self.ct_arrs, self.patient_info_ct) if self.is_loaded else None
+        CoronalPlaneGUI(self.ct_arrs, self.pt_arrs, self.patient_info_ct) if self.is_loaded else None
 
     def load_transverse_plane(self):
         """加载横断面病人图像"""
