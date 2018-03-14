@@ -28,7 +28,6 @@ class CoronalPlaneGUI(tk.Toplevel):
         self.mask_arrs = self.from_transverse_plane_to_coronal_plane(mask_arrs[:, :, :, 0])
 
         # UI设置
-        print()
 
         # ct frame
         ct_frame = tk.Frame(self.top_level)
