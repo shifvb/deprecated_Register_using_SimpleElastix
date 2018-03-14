@@ -3,9 +3,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import numpy as np
 from current_work.utils.ImageProcessor import norm_image, threshold_image
-
-_last_load_img_time = time.time()
-_key_press_interval = 0.09
+from current_work.utils import Clock
 
 
 class TransversePlaneGUI(tk.Toplevel):
@@ -23,6 +21,7 @@ class TransversePlaneGUI(tk.Toplevel):
         self.mask_arrs = mask_arrs
         self.current_index = -1  # 当前图片索引
         self.total_img_num = -1  # 共有多少组图片
+        self.clock = Clock(0.09)
 
         # ct frame
         self.ct_frame = tk.Frame(self.top_level, width=512, height=512)
@@ -79,10 +78,8 @@ class TransversePlaneGUI(tk.Toplevel):
 
     def prev_image_callback(self, event=None):
         """用户点击上一张按钮回调函数"""
-        global _last_load_img_time
-        if time.time() - _last_load_img_time < _key_press_interval:
+        if self.clock.tick() is False:
             return
-        _last_load_img_time = time.time()
         if self.current_index <= 0:  # 越界return
             self.current_index = self.total_img_num
         self.current_index -= 1
@@ -90,10 +87,8 @@ class TransversePlaneGUI(tk.Toplevel):
 
     def next_image_callback(self, event=None):
         """用户点击下一张按钮回掉函数"""
-        global _last_load_img_time
-        if time.time() - _last_load_img_time < _key_press_interval:
+        if self.clock.tick() is False:
             return
-        _last_load_img_time = time.time()
         if self.current_index >= self.total_img_num - 1:  # 越界return
             self.current_index = -1
         self.current_index += 1
