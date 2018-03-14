@@ -2,7 +2,7 @@ import os
 import pickle
 import SimpleITK as sitk
 from current_work.utils.register import register
-from current_work.utils.SUV_calculation.SUVTools import getRegistedSUVs
+from current_work.utils.SUV_calculation import getRegistedSUVs
 
 
 def _load_data(ct_path: str, pt_path: str, mask_path: str):

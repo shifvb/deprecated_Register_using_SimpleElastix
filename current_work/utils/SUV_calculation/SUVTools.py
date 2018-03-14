@@ -12,7 +12,7 @@ ptPixscale = {}  # 关于PT图像的像素间距
 baseInfo = {}  # 计算SUV值所必须的基本属性。一般调用getSUVs或者 getASUV时自动生成
 
 
-def getBaseInfo():
+def getBaseInfo(dicom_dir_path=None):
     '''
     查看读入的切片基本信息
     :return: 返回基本信息字典，包含：
@@ -24,6 +24,11 @@ def getBaseInfo():
     sliceThickness ： 层间厚度
     pixelSpacing：  # tupel类型，两个元素一般相等，表示两个坐标轴上像素点之间对应的实际距离
     '''
+
+    """[INFO] code added by shifvb(shifvb@gmail.com) at 2018.03.14 09:02"""
+    if dicom_dir_path is not None:  # 从第一个文件中获取患者信息
+        _genBaseInfo(dicom.read_file(os.path.join(dicom_dir_path, os.listdir(dicom_dir_path)[0])))
+    """[INFO] code added end"""
     return baseInfo
 
 

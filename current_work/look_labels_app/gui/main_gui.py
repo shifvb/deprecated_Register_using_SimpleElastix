@@ -4,6 +4,7 @@ from tkinter.font import Font
 from tkinter import filedialog
 from current_work.utils.load_data import load_data
 from current_work.look_labels_app.gui import CoronalPlaneGUI, TransversePlaneGUI
+from current_work.utils.SUV_calculation import getBaseInfo
 
 
 class MainGUI(object):
@@ -12,7 +13,13 @@ class MainGUI(object):
         self.config = config
         self.big_font = Font(size=20)
         self.mid_font = Font(size=15)
+
         self.is_loaded = False
+        self.ct_arrs = None
+        self.pt_arrs = None
+        self.suv_arrs = None
+        self.mask_arrs = None
+        self.patient_info = None
 
         # choose folder entry
         self.load_dir_frame = tk.LabelFrame(self.root, text="load file")
@@ -46,6 +53,8 @@ class MainGUI(object):
         _ = load_data(ct_path, pt_path, mask_path, buffer_mode=True, work_directory=path,
                       temp_dir_name=self.config["temp_dir_name"])
         self.ct_arrs, self.pt_arrs, self.suv_arrs, self.mask_arrs = _
+        # 加载病人基本信息
+        self.patient_info = getBaseInfo(pt_path)
 
         self.is_loaded = True
 
@@ -55,7 +64,7 @@ class MainGUI(object):
 
     def load_coronal_plane(self):
         """加载冠状面病人图像"""
-        CoronalPlaneGUI(self.ct_arrs) if self.is_loaded else None
+        CoronalPlaneGUI(self.ct_arrs, self.patient_info) if self.is_loaded else None
 
     def load_transverse_plane(self):
         """加载横断面病人图像"""

@@ -4,10 +4,8 @@ import numpy as np
 from current_work.utils.ImageProcessor import norm_image
 
 
-
-
 class CoronalPlaneGUI(tk.Toplevel):
-    def __init__(self, ct_arrs: np.ndarray):
+    def __init__(self, ct_arrs: np.ndarray, patient_info: dict):
         super().__init__()
         self.top_level = self
         self.top_level.title("Coronal Plane View")
@@ -28,6 +26,7 @@ class CoronalPlaneGUI(tk.Toplevel):
         # right most frame
         right_frame = tk.Frame(self.top_level)
         right_frame.grid(row=0, column=1)
+        print(patient_info)
 
     def load_images(self):
         ct_arr = norm_image(self.ct_arrs[self.current_index])
