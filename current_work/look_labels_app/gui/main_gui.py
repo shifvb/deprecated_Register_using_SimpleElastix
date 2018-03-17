@@ -55,6 +55,7 @@ class MainGUI(object):
         _ = load_data(ct_path, pt_path, mask_path, buffer_mode=True, work_directory=path,
                       temp_dir_name=self.config["temp_dir_name"])
         self.ct_arrs, self.pt_arrs, self.suv_arrs, self.mask_arrs = _
+
         # 加载病人基本信息
         self.patient_info_ct = deepcopy(getBaseInfo(ct_path))
         self.patient_info_pt = deepcopy(getBaseInfo(pt_path))
@@ -67,7 +68,7 @@ class MainGUI(object):
 
     def load_coronal_plane(self):
         """加载冠状面病人图像"""
-        CoronalPlaneGUI(self.ct_arrs, self.pt_arrs, self.mask_arrs, self.patient_info_ct) if self.is_loaded else None
+        CoronalPlaneGUI(self.ct_arrs, self.suv_arrs, self.mask_arrs, self.patient_info_ct) if self.is_loaded else None
 
     def load_transverse_plane(self):
         """加载横断面病人图像"""

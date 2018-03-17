@@ -6,7 +6,7 @@ from current_work.utils import Clock
 
 
 class CoronalPlaneGUI(tk.Toplevel):
-    def __init__(self, ct_arrs: np.ndarray, pt_arrs: np.ndarray, mask_arrs: np.ndarray, patient_info: dict):
+    def __init__(self, ct_arrs: np.ndarray, suv_arrs: np.ndarray, mask_arrs: np.ndarray, patient_info: dict):
         super().__init__()
         # 窗口设置
         self._window_size = (1000, 1024)  # height, width
@@ -23,12 +23,13 @@ class CoronalPlaneGUI(tk.Toplevel):
         self.current_index = 0
         self.total_img_num = ct_arrs.shape[1]
         self.patient_info = patient_info
+        # 数据保真处理
         self.ct_arrs = self.from_transverse_plane_to_coronal_plane(ct_arrs)
-        self.pt_arrs = self.from_transverse_plane_to_coronal_plane(pt_arrs)
+        self.suv_arrs = self.from_transverse_plane_to_coronal_plane(suv_arrs)
         self.mask_arrs = self.from_transverse_plane_to_coronal_plane(mask_arrs[:, :, :, 0])
-
+        # 数据失真处理
         self.ct_arrs = norm_image(self.ct_arrs)
-        self.pt_arrs = self.pt_arrs
+        self.suv_arrs = self.suv_arrs
         self.mask_arrs = norm_image(self.mask_arrs)
 
         # UI设置
@@ -38,11 +39,11 @@ class CoronalPlaneGUI(tk.Toplevel):
         ct_frame.grid(row=0, column=0)
         self.ct_canvas = tk.Canvas(ct_frame, width=512, height=1000)
         self.ct_canvas.pack()
-        # pt frame
-        pt_frame = tk.Frame(self.top_level)
-        pt_frame.grid(row=0, column=1)
-        self.pt_canvas = tk.Canvas(pt_frame, width=512, height=1000)
-        self.pt_canvas.pack()
+        # suv frame
+        suv_frame = tk.Frame(self.top_level)
+        suv_frame.grid(row=0, column=1)
+        self.suv_canvas = tk.Canvas(suv_frame, width=512, height=1000)
+        self.suv_canvas.pack()
         # mask frame
         mask_frame = tk.Frame(self.top_level)
         mask_frame.grid(row=0, column=2)
@@ -62,10 +63,10 @@ class CoronalPlaneGUI(tk.Toplevel):
         ct_arr = self.ct_arrs[self.current_index]
         self.current_ct_img = ImageTk.PhotoImage(self.resize_to_fit_screen(ct_arr))
         self.ct_canvas.create_image(0, 0, image=self.current_ct_img, anchor=tk.NW)
-        # load pt image
-        pt_arr = norm_image(self.pt_arrs[self.current_index])
-        self.current_pt_img = ImageTk.PhotoImage(self.resize_to_fit_screen(pt_arr))
-        self.pt_canvas.create_image(0, 0, image=self.current_pt_img, anchor=tk.NW)
+        # load suv image
+        suv_arr = norm_image(self.suv_arrs[self.current_index])
+        self.current_suv_img = ImageTk.PhotoImage(self.resize_to_fit_screen(suv_arr))
+        self.suv_canvas.create_image(0, 0, image=self.current_suv_img, anchor=tk.NW)
         # load mask image
         mask_arr = self.mask_arrs[self.current_index]
         self.current_mask_img = ImageTk.PhotoImage(self.resize_to_fit_screen(mask_arr))
@@ -84,7 +85,7 @@ class CoronalPlaneGUI(tk.Toplevel):
         _old_size = arrs[0].shape
         _new_size = [int(_) for _ in (_old_size[0] * _ratio, _old_size[1])]
         _new_size.reverse()  # PIL.Image.resize() receive format of (width, height), rather than (height, width)
-        return np.stack([np.array(Image.fromarray(_).resize(_new_size, Image.BILINEAR)) for _ in arrs], axis=0)
+        return np.stack([np.array(Image.fromarray(_).resize(_new_size, Image.BICUBIC)) for _ in arrs], axis=0)
 
     def resize_to_fit_screen(self, arr: np.ndarray):
         """根据窗口大小缩放图像"""
@@ -116,5 +117,5 @@ class CoronalPlaneGUI(tk.Toplevel):
         """关闭子窗口时，绑定在子类实例上的数组所占内存并没有被释放，容易导致内存溢出。
         因此自定义关闭窗口回调函数，删除其所占内存"""
         del self.ct_arrs
-        del self.pt_arrs
+        del self.suv_arrs
         self.top_level.destroy()
