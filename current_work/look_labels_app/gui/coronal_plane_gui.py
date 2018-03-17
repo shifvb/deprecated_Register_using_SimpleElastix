@@ -57,6 +57,18 @@ class CoronalPlaneGUI(tk.Toplevel):
         # call method to load image
         self.load_images()
 
+    @staticmethod
+    def _threshold_image(arr, min_value=None, max_value=None):
+        if min_value is not None:
+            _ = arr < min_value
+            arr *= (1 - _)
+            arr += (_ * min_value)
+        if max_value is not None:
+            _ = arr > max_value
+            arr *= (1 - _)
+            arr += (_ * max_value)
+        return arr
+
     def load_images(self):
         """在界面上加载图像"""
         # load ct image
@@ -64,7 +76,7 @@ class CoronalPlaneGUI(tk.Toplevel):
         self.current_ct_img = ImageTk.PhotoImage(self.resize_to_fit_screen(ct_arr))
         self.ct_canvas.create_image(0, 0, image=self.current_ct_img, anchor=tk.NW)
         # load suv image
-        suv_arr = norm_image(self.suv_arrs[self.current_index])
+        suv_arr = norm_image(self._threshold_image(self.suv_arrs[self.current_index], 1.5, 5.0))
         self.current_suv_img = ImageTk.PhotoImage(self.resize_to_fit_screen(suv_arr))
         self.suv_canvas.create_image(0, 0, image=self.current_suv_img, anchor=tk.NW)
         # load mask image
