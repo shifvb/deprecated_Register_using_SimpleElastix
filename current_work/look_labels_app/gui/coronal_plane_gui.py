@@ -71,16 +71,23 @@ class CoronalPlaneGUI(tk.Toplevel):
 
     def load_images(self):
         """在界面上加载图像"""
-        # load ct image
+        # load arrays
         ct_arr = self.ct_arrs[self.current_index]
-        self.current_ct_img = ImageTk.PhotoImage(self.resize_to_fit_screen(ct_arr))
+        suv_arr = norm_image(self._threshold_image(self.suv_arrs[self.current_index], 1.5, 5.0))
+        # suv_arr = norm_image(self.suv_arrs[self.current_index])
+        mask_arr = self.mask_arrs[self.current_index]
+
+        # load ct image
+        arr_R = np.array(suv_arr / 2 + ct_arr / 2, dtype=np.uint8)
+        arr_G = np.array(ct_arr / 2, dtype=np.uint8)
+        arr_B = np.array(ct_arr / 2, dtype=np.uint8)
+        arr_RGB = np.stack([arr_R, arr_G, arr_B], axis=0).transpose([1, 2, 0])
+        self.current_ct_img = ImageTk.PhotoImage(self.resize_to_fit_screen(arr_RGB))
         self.ct_canvas.create_image(0, 0, image=self.current_ct_img, anchor=tk.NW)
         # load suv image
-        suv_arr = norm_image(self._threshold_image(self.suv_arrs[self.current_index], 1.5, 5.0))
         self.current_suv_img = ImageTk.PhotoImage(self.resize_to_fit_screen(suv_arr))
         self.suv_canvas.create_image(0, 0, image=self.current_suv_img, anchor=tk.NW)
         # load mask image
-        mask_arr = self.mask_arrs[self.current_index]
         self.current_mask_img = ImageTk.PhotoImage(self.resize_to_fit_screen(mask_arr))
         self.mask_canvas.create_image(0, 0, image=self.current_mask_img, anchor=tk.NW)
 

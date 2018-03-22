@@ -7,7 +7,7 @@ from current_work.utils import Clock
 
 
 class TransversePlaneGUI(tk.Toplevel):
-    def __init__(self, ct_arrs, suv_arrs, mask_arrs):
+    def __init__(self, ct_arrs, suv_arrs, pt_arrs, mask_arrs):
         super().__init__()
         self.top_level = self
         self.top_level.title("Transverse Plane View")
@@ -18,10 +18,11 @@ class TransversePlaneGUI(tk.Toplevel):
 
         self.ct_arrs = ct_arrs
         self.suv_arrs = suv_arrs
+        self.pt_arrs = pt_arrs
         self.mask_arrs = mask_arrs
         self.current_index = -1  # 当前图片索引
         self.total_img_num = -1  # 共有多少组图片
-        self.clock = Clock(0.09)
+        self.clock = Clock(0.12)
 
         # ct frame
         self.ct_frame = tk.Frame(self.top_level, width=512, height=512)
@@ -42,6 +43,7 @@ class TransversePlaneGUI(tk.Toplevel):
         self.suv_frame.propagate(False)
         self.suv_frame.grid(row=0, column=1)
         self.suv_canvas = tk.Canvas(self.suv_frame, width=512, height=512)
+        self.suv_canvas.bind("<Motion>", self.suv_mouse_move_callback)
         self.suv_canvas.pack()
 
         # suv & label frame
@@ -51,24 +53,37 @@ class TransversePlaneGUI(tk.Toplevel):
         self.suvl_canvas = tk.Canvas(self.suvl_frame, width=512, height=512)
         self.suvl_canvas.pack()
 
-        # label frame
-        self.label_frame = tk.Frame(self.top_level, width=512, height=512)
-        self.label_frame.propagate(False)
-        self.label_frame.grid(row=1, column=2)
-        self.label_canvas = tk.Canvas(self.label_frame, width=512, height=512)
-        self.label_canvas.pack()
+        # pt frame
+        self.pt_frame = tk.Frame(self.top_level, width=512, height=512)
+        self.pt_frame.propagate(False)
+        self.pt_frame.grid(row=0, column=2)
+        self.pt_canvas = tk.Canvas(self.pt_frame, width=512, height=512)
+        self.pt_canvas.pack()
+        self.pt_canvas.bind("<Motion>", self.pt_mouse_move_callback)
 
-        right_frame = tk.LabelFrame(self.top_level, text="suv threshold")
+        # suvt frame
+        self.suvt_frame = tk.Frame(self.top_level, width=512, height=512)
+        self.suvt_frame.propagate(False)
+        self.suvt_frame.grid(row=1, column=2)
+        self.suvt_canvas = tk.Canvas(self.suvt_frame, width=512, height=512)
+        self.suvt_canvas.pack()
+
+        right_frame = tk.Frame(self.top_level)
+        right_frame.propagate(False)
         right_frame.grid(row=0, column=3)
         # 调整SUV阈值
         self.suv_threshold_frame = tk.LabelFrame(right_frame, width=384, text="SUV阈值")
-        # self.suv_threshold_frame.propagate(False)
-        self.suv_threshold_frame.grid(row=1, column=0)
+        self.suv_threshold_frame.grid(row=0, column=0)
         self.suv_scale = tk.Scale(self.suv_threshold_frame)
         self.suv_scale.configure(from_=1.0, to=2.5, resolution=0.1, orient=tk.HORIZONTAL,
                                  command=self.suv_scale_callback, length=380)
         self.suv_scale.set(1.5)
         self.suv_scale.pack()
+        # 显示图像当前值
+        # self.current_img_value_frame = tk.LabelFrame(right_frame, width=384, text="图像实际值")
+        # self.current_img_value_frame.grid(row=1, column=0)
+        self.current_img_value_label = tk.Label(right_frame)
+        self.current_img_value_label.grid(row=1, column=0)
 
         # 加载后设置变量
         self.total_img_num = len(self.ct_arrs)
@@ -106,43 +121,50 @@ class TransversePlaneGUI(tk.Toplevel):
         self.current_suv_img = ImageTk.PhotoImage(Image.fromarray(suv_arr, "L").resize([512, 512]))
         self.suv_canvas.create_image(0, 0, image=self.current_suv_img, anchor=tk.NW)
         self.suv_canvas.create_text(20, 20, text="SUV", fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW)
+        # (row_0, col_2) 加载pt
+        pt_arr = norm_image(self.pt_arrs[self.current_index])
+        self.current_pt_img = ImageTk.PhotoImage(Image.fromarray(pt_arr, "L"))
+        self.pt_canvas.create_image(0, 0, image=self.current_pt_img, anchor=tk.NW)
+        self.pt_canvas.create_text(20, 20, text="PET", fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW)
 
         # 加载mask
         mask_arr = norm_image(self.mask_arrs[self.current_index])
+        mask_arr = (mask_arr[:, :, 0] > 128) * 255
 
         # (row_1, col_0) 加载ct&label
-        arr_0 = np.array(ct_arr)
-        arr_1 = (np.array(mask_arr)[:, :, 0] > 128) * 255
-        arr_2 = np.empty(shape=[3, arr_0.shape[0], arr_0.shape[1]], dtype=np.uint8)
-        arr_2[0] = (arr_0 + arr_1) / 2  # R通道
-        arr_2[1] = arr_0  # G通道
-        arr_2[2] = arr_1  # B通道
-        arr_2 = arr_2.transpose([1, 2, 0])
-        self.current_ctl_img = ImageTk.PhotoImage(Image.fromarray(arr_2, "RGB"))
+        self.current_ctl_img = ImageTk.PhotoImage(Image.fromarray(self.gen_fuse_arr(ct_arr, mask_arr)))
         self.ctl_canvas.create_image(0, 0, image=self.current_ctl_img, anchor=tk.NW)
         self.ctl_canvas.create_text(20, 20, text="CT & Label", fill="yellow", font=("Arial", 20, "normal"),
                                     anchor=tk.NW)
         # (row_1, col_1) 加载suv&label
-        arr_0 = np.array(suv_arr)
-        arr_1 = (np.array(mask_arr)[:, :, 0] > 128) * 255
-        arr_2 = np.empty(shape=[3, arr_0.shape[0], arr_0.shape[1]], dtype=np.uint8)
-        arr_2[0] = (arr_0 + arr_1) / 2  # R通道
-        arr_2[1] = arr_0  # G通道
-        arr_2[2] = arr_1  # B通道
-        arr_2 = arr_2.transpose([1, 2, 0])
-        self.current_suvl_img = ImageTk.PhotoImage(Image.fromarray(arr_2, "RGB"))
+        self.current_suvl_img = ImageTk.PhotoImage(Image.fromarray(self.gen_fuse_arr(suv_arr, mask_arr)))
         self.suvl_canvas.create_image(0, 0, image=self.current_suvl_img, anchor=tk.NW)
         self.suvl_canvas.create_text(20, 20, text="SUV & Label", fill="yellow", font=("Arial", 20, "normal"),
                                      anchor=tk.NW)
+
         # (row_1, col_2) 加载suv > 1.5
         self.suv_scale_callback()
 
         # 设置title
         self.top_level.title("当前图像: {}/{}".format(self.current_index + 1, self.total_img_num))
 
+    def gen_fuse_arr(self, base_arr, fuse_arr):
+        """base数组保持白色，fuse数组为红色，融合后产生RGB数组"""
+        return np.stack((base_arr / 2 + fuse_arr / 2, base_arr / 2, base_arr / 2)).transpose([1, 2, 0]).astype(np.uint8)
+
     def suv_scale_callback(self, *args):
         thsuv_arr = threshold_image(self.suv_arrs[self.current_index], self.suv_scale.get()) * 255
         self.current_thsuv_img = ImageTk.PhotoImage(Image.fromarray(thsuv_arr, "L"))
-        self.label_canvas.create_image(0, 0, image=self.current_thsuv_img, anchor=tk.NW)
-        self.label_canvas.create_text(20, 20, fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW,
-                                      text="SUV > {}".format(self.suv_scale.get()))
+        self.suvt_canvas.create_image(0, 0, image=self.current_thsuv_img, anchor=tk.NW)
+        self.suvt_canvas.create_text(20, 20, fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW,
+                                     text="SUV > {}".format(self.suv_scale.get()))
+
+    def pt_mouse_move_callback(self, event):
+        """鼠标在图像上移动时，查看值的回调函数"""
+        _v = self.pt_arrs[self.current_index][event.y][event.x]
+        self.current_img_value_label.configure(text="({:0>3}, {:0>3})= {:.2f}".format(event.x, event.y, _v).ljust(35))
+
+    def suv_mouse_move_callback(self, event):
+        """鼠标在图像上移动时，查看值的回调函数"""
+        _v = self.suv_arrs[self.current_index][event.y][event.x]
+        self.current_img_value_label.configure(text="({:0>3}, {:0>3})= {:.2f}".format(event.x, event.y, _v).ljust(35))

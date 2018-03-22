@@ -72,4 +72,4 @@ class MainGUI(object):
 
     def load_transverse_plane(self):
         """加载横断面病人图像"""
-        TransversePlaneGUI(self.ct_arrs, self.suv_arrs, self.mask_arrs) if self.is_loaded else None
+        TransversePlaneGUI(self.ct_arrs, self.suv_arrs, self.pt_arrs, self.mask_arrs) if self.is_loaded else None
