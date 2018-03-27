@@ -1,6 +1,11 @@
 import numpy as np
 
 
+def gen_fuse_arr(base_arr: np.ndarray, fuse_arr: np.ndarray):
+    """base数组保持白色，fuse数组为红色，融合后产生RGB数组"""
+    return np.stack((base_arr / 2 + fuse_arr / 2, base_arr / 2, base_arr / 2)).transpose([1, 2, 0]).astype(np.uint8)
+
+
 def threshold_image(arr: np.ndarray, threshold: float):
     """
     将一个numpy数组形式的图像阈值化，并归一化

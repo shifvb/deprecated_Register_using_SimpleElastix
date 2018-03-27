@@ -1,8 +1,6 @@
-import time
 import tkinter as tk
 from PIL import Image, ImageTk
-import numpy as np
-from current_work.utils.ImageProcessor import norm_image, threshold_image
+from current_work.utils.ImageProcessor import norm_image, threshold_image, gen_fuse_arr
 from current_work.utils import Clock
 
 
@@ -106,7 +104,7 @@ class TransversePlaneGUI(tk.Toplevel):
         ct_arr = norm_image(self.hu_arrs[self.current_index])
         self.current_ct_img = ImageTk.PhotoImage(Image.fromarray(ct_arr, "L"))
         self.ct_canvas.create_image(0, 0, image=self.current_ct_img, anchor=tk.NW)
-        self.ct_canvas.create_text(20, 20, text="CT", fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW)
+        self.ct_canvas.create_text(20, 20, text="Hu", fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW)
         # (row_0, col_1)加载suv
         suv_arr = norm_image(self.suv_arrs[self.current_index])
         self.current_suv_img = ImageTk.PhotoImage(Image.fromarray(suv_arr, "L").resize([512, 512]))
@@ -118,12 +116,12 @@ class TransversePlaneGUI(tk.Toplevel):
         mask_arr = (mask_arr > 128) * 255
 
         # (row_1, col_0) 加载ct&label
-        self.current_ctl_img = ImageTk.PhotoImage(Image.fromarray(self.gen_fuse_arr(ct_arr, mask_arr)))
+        self.current_ctl_img = ImageTk.PhotoImage(Image.fromarray(gen_fuse_arr(ct_arr, mask_arr)))
         self.ctl_canvas.create_image(0, 0, image=self.current_ctl_img, anchor=tk.NW)
-        self.ctl_canvas.create_text(20, 20, text="CT & Label", fill="yellow", font=("Arial", 20, "normal"),
+        self.ctl_canvas.create_text(20, 20, text="Hu & Label", fill="yellow", font=("Arial", 20, "normal"),
                                     anchor=tk.NW)
         # (row_1, col_1) 加载suv&label
-        self.current_suvl_img = ImageTk.PhotoImage(Image.fromarray(self.gen_fuse_arr(suv_arr, mask_arr)))
+        self.current_suvl_img = ImageTk.PhotoImage(Image.fromarray(gen_fuse_arr(suv_arr, mask_arr)))
         self.suvl_canvas.create_image(0, 0, image=self.current_suvl_img, anchor=tk.NW)
         self.suvl_canvas.create_text(20, 20, text="SUV & Label", fill="yellow", font=("Arial", 20, "normal"),
                                      anchor=tk.NW)
@@ -133,10 +131,6 @@ class TransversePlaneGUI(tk.Toplevel):
 
         # 设置title
         self.top_level.title("当前图像: {}/{}".format(self.current_index + 1, self.total_img_num))
-
-    def gen_fuse_arr(self, base_arr, fuse_arr):
-        """base数组保持白色，fuse数组为红色，融合后产生RGB数组"""
-        return np.stack((base_arr / 2 + fuse_arr / 2, base_arr / 2, base_arr / 2)).transpose([1, 2, 0]).astype(np.uint8)
 
     def suv_scale_callback(self, *args):
         thsuv_arr = threshold_image(self.suv_arrs[self.current_index], self.suv_scale.get()) * 255
