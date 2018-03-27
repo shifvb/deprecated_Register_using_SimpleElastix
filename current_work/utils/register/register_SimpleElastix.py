@@ -9,16 +9,16 @@ __author__ = "shifvb"
 __email__ = "shifvb@gmail.com"
 
 
-def register_image_series_pt2ct(ct_series_dir: str, pt_series_dir: str):
+def get_registered_suv_and_hu_array(ct_series_dir: str, pt_series_dir: str):
     """
     将pet图像序列配准到ct图像序列上
-    注意：SimpleElastix读取的是Hu值及SUV值。
-    :param ct_series_dir: ct图像序列绝对路径
-    :param pt_series_dir: pt图像序列绝对路径
+    Caution：What SimpleElastix reads are Hu values and SUV values.
+    :param ct_series_dir: folder name contains ct series (absolute path)
+    :param pt_series_dir: folder name contains pt series (absolute path)
     :return: 原CT图像Hu值序列数组(int32类型)，配准后的SUV图像序列数组(float32类型)
         其中每个数组的shape为：(图像序列数, 配准后图像高度, 配准后图像宽度)
             若将200张分辨率为128x128的pet图像配准到200张宽度为512，高度为300的ct图像上，
-            则返回数组的shape为(200, 300, 512)
+            则返回数组的shape为(200, 300, 512
     """
     # step_1. load image series
     _original_dir = os.path.abspath(os.curdir)
@@ -76,8 +76,8 @@ def _get_ratio(pt_series_dir: str):
 
 def main():
     # 配准
-    result = register_image_series_pt2ct(ct_series_dir=r"F:\做好的分割数据\迟学梅\CT",
-                                         pt_series_dir=r"F:\做好的分割数据\迟学梅\PT")
+    result = get_registered_suv_and_hu_array(ct_series_dir=r"F:\做好的分割数据\迟学梅\CT",
+                                             pt_series_dir=r"F:\做好的分割数据\迟学梅\PT")
     sitk.Show(sitk.GetImageFromArray(result[0]))
     sitk.Show(sitk.GetImageFromArray(result[1]))
 
