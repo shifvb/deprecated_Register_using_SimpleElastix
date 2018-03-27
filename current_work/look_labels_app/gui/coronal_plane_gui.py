@@ -6,7 +6,7 @@ from current_work.utils import Clock
 
 
 class CoronalPlaneGUI(tk.Toplevel):
-    def __init__(self, ct_arrs: np.ndarray, suv_arrs: np.ndarray, mask_arrs: np.ndarray, patient_info: dict):
+    def __init__(self, hu_arrs: np.ndarray, suv_arrs: np.ndarray, mask_arrs: np.ndarray, patient_info: dict):
         super().__init__()
         # 窗口设置
         self._window_size = (1000, 1024)  # height, width
@@ -21,23 +21,23 @@ class CoronalPlaneGUI(tk.Toplevel):
 
         # 数据设置
         self.current_index = 0
-        self.total_img_num = ct_arrs.shape[1]
+        self.total_img_num = hu_arrs.shape[1]
         self.patient_info = patient_info
         # 数据保真处理
-        self.ct_arrs = self.from_transverse_plane_to_coronal_plane(ct_arrs)
+        self.hu_arrs = self.from_transverse_plane_to_coronal_plane(hu_arrs)
         self.suv_arrs = self.from_transverse_plane_to_coronal_plane(suv_arrs)
-        self.mask_arrs = self.from_transverse_plane_to_coronal_plane(mask_arrs[:, :, :, 0])
+        self.mask_arrs = self.from_transverse_plane_to_coronal_plane(mask_arrs)
         # 数据失真处理
-        self.ct_arrs = norm_image(self.ct_arrs)
+        self.hu_arrs = norm_image(self.hu_arrs)
         self.suv_arrs = self.suv_arrs
         self.mask_arrs = norm_image(self.mask_arrs)
 
         # UI设置
 
-        # ct frame
-        ct_frame = tk.Frame(self.top_level)
-        ct_frame.grid(row=0, column=0)
-        self.ct_canvas = tk.Canvas(ct_frame, width=512, height=1000)
+        # hu frame
+        hu_frame = tk.Frame(self.top_level)
+        hu_frame.grid(row=0, column=0)
+        self.ct_canvas = tk.Canvas(hu_frame, width=512, height=1000)
         self.ct_canvas.pack()
         # suv frame
         suv_frame = tk.Frame(self.top_level)
@@ -72,7 +72,7 @@ class CoronalPlaneGUI(tk.Toplevel):
     def load_images(self):
         """在界面上加载图像"""
         # load arrays
-        ct_arr = self.ct_arrs[self.current_index]
+        ct_arr = self.hu_arrs[self.current_index]
         suv_arr = norm_image(self._threshold_image(self.suv_arrs[self.current_index], 1.5, 5.0))
         # suv_arr = norm_image(self.suv_arrs[self.current_index])
         mask_arr = self.mask_arrs[self.current_index]
@@ -135,6 +135,6 @@ class CoronalPlaneGUI(tk.Toplevel):
     def close_window_callback(self):
         """关闭子窗口时，绑定在子类实例上的数组所占内存并没有被释放，容易导致内存溢出。
         因此自定义关闭窗口回调函数，删除其所占内存"""
-        del self.ct_arrs
+        del self.hu_arrs
         del self.suv_arrs
         self.top_level.destroy()
