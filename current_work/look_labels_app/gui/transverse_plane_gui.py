@@ -7,7 +7,7 @@ from current_work.utils import Clock
 
 
 class TransversePlaneGUI(tk.Toplevel):
-    def __init__(self, ct_arrs, suv_arrs, pt_arrs, mask_arrs):
+    def __init__(self, hu_arrs, suv_arrs, mask_arrs):
         super().__init__()
         self.top_level = self
         self.top_level.title("Transverse Plane View")
@@ -16,13 +16,12 @@ class TransversePlaneGUI(tk.Toplevel):
         self.top_level.bind("<Right>", self.next_image_callback)
         self.top_level.focus_set()
 
-        self.ct_arrs = ct_arrs
+        self.hu_arrs = hu_arrs
         self.suv_arrs = suv_arrs
-        self.pt_arrs = pt_arrs
         self.mask_arrs = mask_arrs
         self.current_index = -1  # 当前图片索引
         self.total_img_num = -1  # 共有多少组图片
-        self.clock = Clock(0.12)
+        self.clock = Clock(0.12)  # 设置最小键盘事件触发间隔
 
         # ct frame
         self.ct_frame = tk.Frame(self.top_level, width=512, height=512)
@@ -31,13 +30,6 @@ class TransversePlaneGUI(tk.Toplevel):
         self.ct_canvas = tk.Canvas(self.ct_frame, width=512, height=512)
         self.ct_canvas.pack()
 
-        # ct & label frame
-        self.ctl_frame = tk.Frame(self.top_level, width=512, height=512)
-        self.ctl_frame.propagate(False)
-        self.ctl_frame.grid(row=1, column=0)
-        self.ctl_canvas = tk.Canvas(self.ctl_frame, width=512, height=512)
-        self.ctl_canvas.pack()
-
         # suv frame
         self.suv_frame = tk.Frame(self.top_level, width=512, height=512)
         self.suv_frame.propagate(False)
@@ -45,6 +37,13 @@ class TransversePlaneGUI(tk.Toplevel):
         self.suv_canvas = tk.Canvas(self.suv_frame, width=512, height=512)
         self.suv_canvas.bind("<Motion>", self.suv_mouse_move_callback)
         self.suv_canvas.pack()
+
+        # ct & label frame
+        self.ctl_frame = tk.Frame(self.top_level, width=512, height=512)
+        self.ctl_frame.propagate(False)
+        self.ctl_frame.grid(row=1, column=0)
+        self.ctl_canvas = tk.Canvas(self.ctl_frame, width=512, height=512)
+        self.ctl_canvas.pack()
 
         # suv & label frame
         self.suvl_frame = tk.Frame(self.top_level, width=512, height=512)
@@ -78,7 +77,7 @@ class TransversePlaneGUI(tk.Toplevel):
         self.current_img_value_label.grid(row=1, column=0)
 
         # 加载后设置变量
-        self.total_img_num = len(self.ct_arrs)
+        self.total_img_num = len(self.hu_arrs)
         self.current_index = 0
         # 加载图像
         self._load_images()
@@ -104,7 +103,7 @@ class TransversePlaneGUI(tk.Toplevel):
     def _load_images(self):
         """加载界面图像"""
         # (row_0, col_0) 加载ct
-        ct_arr = norm_image(self.ct_arrs[self.current_index])
+        ct_arr = norm_image(self.hu_arrs[self.current_index])
         self.current_ct_img = ImageTk.PhotoImage(Image.fromarray(ct_arr, "L"))
         self.ct_canvas.create_image(0, 0, image=self.current_ct_img, anchor=tk.NW)
         self.ct_canvas.create_text(20, 20, text="CT", fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW)
