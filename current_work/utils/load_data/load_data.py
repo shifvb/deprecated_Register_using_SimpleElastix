@@ -22,14 +22,15 @@ def _load_data(ct_path: str, pt_path: str, mask_path: str):
     return hu_arrs, suv_arrs, mask_arrs
 
 
-def load_data(ct_path: str, pt_path: str, mask_path: str, work_directory=None):
-    """加载数据(优先使用缓存), 详细介绍见函数 _load_data()"""
+def load_data(ct_path: str, pt_path: str, mask_path: str, work_directory: str):
+    """加载数据(优先使用缓存), 缓存文件路径为 {work_directory/temp/registered.pickle}
+    详细介绍见函数 _load_data()"""
     # 如果文件夹不存在创建文件夹
     _temp_dir = os.path.join(work_directory, "temp")
     if not os.path.isdir(_temp_dir):
         os.mkdir(_temp_dir)
     # 如果没有缓存，那么就写入缓存
-    _temp_filename = os.path.join(_temp_dir, "registered.pydump")
+    _temp_filename = os.path.join(_temp_dir, "registered.pickle")
     if not os.path.exists(_temp_filename):
         pickle.dump(_load_data(ct_path, pt_path, mask_path), open(_temp_filename, 'wb'))
     # 读取缓存

@@ -53,14 +53,6 @@ class TransversePlaneGUI(tk.Toplevel):
         self.suvl_canvas = tk.Canvas(self.suvl_frame, width=512, height=512)
         self.suvl_canvas.pack()
 
-        # pt frame
-        self.pt_frame = tk.Frame(self.top_level, width=512, height=512)
-        self.pt_frame.propagate(False)
-        self.pt_frame.grid(row=0, column=2)
-        self.pt_canvas = tk.Canvas(self.pt_frame, width=512, height=512)
-        self.pt_canvas.pack()
-        self.pt_canvas.bind("<Motion>", self.pt_mouse_move_callback)
-
         # suvt frame
         self.suvt_frame = tk.Frame(self.top_level, width=512, height=512)
         self.suvt_frame.propagate(False)
@@ -121,15 +113,10 @@ class TransversePlaneGUI(tk.Toplevel):
         self.current_suv_img = ImageTk.PhotoImage(Image.fromarray(suv_arr, "L").resize([512, 512]))
         self.suv_canvas.create_image(0, 0, image=self.current_suv_img, anchor=tk.NW)
         self.suv_canvas.create_text(20, 20, text="SUV", fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW)
-        # (row_0, col_2) 加载pt
-        pt_arr = norm_image(self.pt_arrs[self.current_index])
-        self.current_pt_img = ImageTk.PhotoImage(Image.fromarray(pt_arr, "L"))
-        self.pt_canvas.create_image(0, 0, image=self.current_pt_img, anchor=tk.NW)
-        self.pt_canvas.create_text(20, 20, text="PET", fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW)
 
         # 加载mask
         mask_arr = norm_image(self.mask_arrs[self.current_index])
-        mask_arr = (mask_arr[:, :, 0] > 128) * 255
+        mask_arr = (mask_arr > 128) * 255
 
         # (row_1, col_0) 加载ct&label
         self.current_ctl_img = ImageTk.PhotoImage(Image.fromarray(self.gen_fuse_arr(ct_arr, mask_arr)))
@@ -158,11 +145,6 @@ class TransversePlaneGUI(tk.Toplevel):
         self.suvt_canvas.create_image(0, 0, image=self.current_thsuv_img, anchor=tk.NW)
         self.suvt_canvas.create_text(20, 20, fill="yellow", font=("Arial", 20, "normal"), anchor=tk.NW,
                                      text="SUV > {}".format(self.suv_scale.get()))
-
-    def pt_mouse_move_callback(self, event):
-        """鼠标在图像上移动时，查看值的回调函数"""
-        _v = self.pt_arrs[self.current_index][event.y][event.x]
-        self.current_img_value_label.configure(text="({:0>3}, {:0>3})= {:.2f}".format(event.x, event.y, _v).ljust(35))
 
     def suv_mouse_move_callback(self, event):
         """鼠标在图像上移动时，查看值的回调函数"""

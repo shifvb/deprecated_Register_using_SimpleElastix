@@ -52,9 +52,8 @@ class MainGUI(object):
         pt_path = os.path.join(path, "PT")
 
         # 加载图像序列
-        _ = load_data(ct_path, pt_path, mask_path, buffer_mode=True, work_directory=path,
-                      temp_dir_name=self.config["temp_dir_name"])
-        self.ct_arrs, self.pt_arrs, self.suv_arrs, self.mask_arrs = _
+        _ = load_data(ct_path, pt_path, mask_path, work_directory=path)
+        self.ct_arrs, self.suv_arrs, self.mask_arrs = _
 
         # 加载病人基本信息
         self.patient_info_ct = deepcopy(getBaseInfo(ct_path))
