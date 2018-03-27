@@ -1,7 +1,9 @@
 import os
 import pickle
+
 import SimpleITK as sitk
-from current_work.utils.register import register
+
+from current_work.look_labels_app.utils import register
 
 
 def _load_data(ct_path: str, pt_path: str, mask_path: str):

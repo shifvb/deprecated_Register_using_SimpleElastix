@@ -1,11 +1,12 @@
 import os
-from copy import deepcopy
 import tkinter as tk
-from tkinter.font import Font
+from copy import deepcopy
 from tkinter import filedialog
-from current_work.utils.load_data import load_data
+from tkinter.font import Font
+
+from current_work.look_labels_app.utils.SUV_calculation import getBaseInfo
 from current_work.look_labels_app.gui import CoronalPlaneGUI, TransversePlaneGUI
-from current_work.utils.SUV_calculation import getBaseInfo
+from current_work.look_labels_app.utils.load_data import load_data
 
 
 class MainGUI(object):

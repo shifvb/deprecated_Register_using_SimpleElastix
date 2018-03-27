@@ -1,7 +1,9 @@
 import os
 import time
+
 import SimpleITK as sitk
-from current_work.utils.SUV_calculation.SUVTools import getASuv
+
+from current_work.look_labels_app.utils.SUV_calculation.SUVTools import getASuv
 
 __version__ = (0, 4, 0)
 __last_modified__ = 1522111810

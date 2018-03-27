@@ -1,7 +1,9 @@
 import tkinter as tk
+
 from PIL import Image, ImageTk
-from current_work.utils.ImageProcessor import norm_image, threshold_image, gen_fuse_arr
-from current_work.utils import Clock
+
+from current_work.look_labels_app.utils.Clock import Clock
+from current_work.look_labels_app.utils.ImageProcessor import norm_image, threshold_image, gen_fuse_arr
 
 
 class TransversePlaneGUI(tk.Toplevel):
