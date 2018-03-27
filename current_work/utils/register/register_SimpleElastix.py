@@ -1,8 +1,5 @@
 import os
 import time
-import numpy as np
-import pydicom
-from PIL import Image
 import SimpleITK as sitk
 from current_work.utils.SUV_calculation.SUVTools import getASuv
 
@@ -18,12 +15,10 @@ def register_image_series_pt2ct(ct_series_dir: str, pt_series_dir: str):
     注意：SimpleElastix读取的是Hu值及SUV值。
     :param ct_series_dir: ct图像序列绝对路径
     :param pt_series_dir: pt图像序列绝对路径
-    :return: 配准后的SUV图像序列数组，原CT图像Hu值序列数组，原PT图像SUV值序列数组
-        class ：np.ndarray
-        dtype ：np.float32
-        shape ：(图像序列数, 配准后图像高度, 配准后图像宽度)
-            若将200张分辨率为128x128的pet图像配准到200张分辨率为512x512的ct图像上，
-            则返回数组的shape为(200, 512, 512)
+    :return: 原CT图像Hu值序列数组(int32类型)，配准后的SUV图像序列数组(float32类型)
+        其中每个数组的shape为：(图像序列数, 配准后图像高度, 配准后图像宽度)
+            若将200张分辨率为128x128的pet图像配准到200张宽度为512，高度为300的ct图像上，
+            则返回数组的shape为(200, 300, 512)
     """
     # step_1. load image series
     _original_dir = os.path.abspath(os.curdir)
@@ -57,7 +52,7 @@ def register_image_series_pt2ct(ct_series_dir: str, pt_series_dir: str):
     registered_suv_arrs /= ratio
     suv_arrs /= ratio
 
-    return registered_suv_arrs, hu_arrs, suv_arrs
+    return hu_arrs, registered_suv_arrs
 
 
 def _get_ratio(pt_series_dir: str):
@@ -69,10 +64,10 @@ def _get_ratio(pt_series_dir: str):
     """
     pt_file_name = os.listdir(pt_series_dir)[0]
     # load image using SimpleElastix
-    _original_dir = os.curdir
+    _curdir = os.curdir
     os.chdir(pt_series_dir)
     sitk_arr = sitk.GetArrayFromImage(sitk.ReadImage(pt_file_name))
-    os.chdir(_original_dir)
+    os.chdir(_curdir)
     # load image using li's suv calculation
     li_arr = getASuv(pt_file_name)
     # return ratio
@@ -85,7 +80,6 @@ def main():
                                          pt_series_dir=r"F:\做好的分割数据\迟学梅\PT")
     sitk.Show(sitk.GetImageFromArray(result[0]))
     sitk.Show(sitk.GetImageFromArray(result[1]))
-    sitk.Show(sitk.GetImageFromArray(result[2]))
 
 
 if __name__ == '__main__':
