@@ -4,7 +4,7 @@ import glob
 import time
 
 import numpy as np
-import dicom
+import pydicom as dicom
 import datetime
 
 ctPixscale = {}  # 关于CT图像的像素间距，属性包括    pixelSpacing：像素间间距   sliceThickness：切片厚度

@@ -1,7 +1,7 @@
 import os
 import time
 import numpy as np
-import dicom
+import pydicom
 from PIL import Image
 import SimpleITK as sitk
 
@@ -16,7 +16,7 @@ def register_image_series_pt2ct(ct_series_dir: str, pt_series_dir: str):
     将pet图像序列配准到ct图像序列上
     :param ct_series_dir: ct图像序列绝对路径
     :param pt_series_dir: pt图像序列绝对路径
-    :return: 配准后的pt图像序列数组，原ct图像序列数组，原pt图像序列数组
+    :return: 配准后的SUV图像序列数组，原CT图像Hu值序列数组，原PT图像加权后SUV值序列数组
         class ：np.ndarray
         dtype ：np.float32
         shape ：(图像序列数, 配准后图像高度, 配准后图像宽度)
@@ -26,23 +26,23 @@ def register_image_series_pt2ct(ct_series_dir: str, pt_series_dir: str):
     # 0. 加载图像序列
     _original_dir = os.path.abspath(os.curdir)
     os.chdir(ct_series_dir)
-    ct_series = sitk.ReadImage(os.listdir(ct_series_dir))
+    Hu_imgs = sitk.ReadImage(os.listdir(ct_series_dir))
     os.chdir(pt_series_dir)
-    pt_series = sitk.ReadImage(os.listdir(pt_series_dir))
+    SUV_imgs = sitk.ReadImage(os.listdir(pt_series_dir))
     os.chdir(_original_dir)
     # 1. 设置配准参数
     parameter_map = sitk.GetDefaultParameterMap("translation")
     parameter_map['RequiredRatioOfValidSamples'] = ['0.05']
     # 2. 初始化filter并设置参数
     elastix_image_filter = sitk.ElastixImageFilter()
-    elastix_image_filter.SetFixedImage(ct_series)
-    elastix_image_filter.SetMovingImage(pt_series)
+    elastix_image_filter.SetFixedImage(Hu_imgs)
+    elastix_image_filter.SetMovingImage(SUV_imgs)
     elastix_image_filter.SetParameterMap(parameter_map)
     # 3. 进行配准计算
     elastix_image_filter.Execute()
     # 4. 得出配准结果
     result_image = elastix_image_filter.GetResultImage()
-    return sitk.GetArrayFromImage(result_image), sitk.GetArrayFromImage(ct_series), sitk.GetArrayFromImage(pt_series)
+    return sitk.GetArrayFromImage(result_image), sitk.GetArrayFromImage(Hu_imgs), sitk.GetArrayFromImage(SUV_imgs)
 
 
 def main():
